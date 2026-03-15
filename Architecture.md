@@ -37,16 +37,12 @@ x * y = k
 
 As prices move:
 
-```solidity
-pool rebalances
-```
+- pool rebalances
 
 LP effectively:
 
-```solidity
-sells winners
-buys losers
-```
+- sells winners
+- buys losers
 
 This is equivalent to being **short volatility**.
 
@@ -75,10 +71,8 @@ The AMM sells ETH as the price rises.
 
 LP ends with:
 
-```solidity
-less ETH
-more USDC
-```
+- less ETH
+- more USDC
 
 Compared to simply holding ETH, the LP underperforms.
 
@@ -86,11 +80,11 @@ This is **impermanent loss**.
 
 Key issues:
 
-#### 1. LP exposure is hidden
+### 1. LP exposure is hidden
 
 LPs do not know their **real-time delta exposure**.
 
-#### 2. Hedging is complex
+### 2. Hedging is complex
 
 To hedge risk, LPs must:
 
@@ -100,7 +94,7 @@ To hedge risk, LPs must:
 
 This is impractical for most users.
 
-#### 3. No automated system exists
+### 3. No automated system exists
 
 Even advanced DeFi users rely on **manual strategies or off-chain bots**.
 
@@ -164,7 +158,7 @@ Deployment:
 
 The protocol contains three core layers:
 
-#### 1. AMM Layer
+### 1. AMM Layer
 
 Responsible for:
 
@@ -174,7 +168,7 @@ Responsible for:
 
 Implemented using **Uniswap v4 Hooks**.
 
-#### 2. Reactive Automation Layer
+### 2. Reactive Automation Layer
 
 Responsible for:
 
@@ -184,7 +178,7 @@ Responsible for:
 
 Built using **Reactive Network automation**.
 
-#### 3. Hedging Execution Layer
+### 3. Hedging Execution Layer
 
 Responsible for:
 
@@ -196,9 +190,7 @@ Implemented via a **Hedge Controller contract**.
 
 
 
-## 1. AMM Layer
-
-#### Implemented using Uniswap v4 Hooks
+## 1. AMM Layer (v4 Hooks)
 
 Hooks allow custom logic during pool events.
 
@@ -336,9 +328,7 @@ Purpose:
 
 Hooks return:
 
-```solidity
-BalanceDelta
-```
+- BalanceDelta
 
 In this implementation:
 
@@ -380,9 +370,7 @@ threshold = 2 ETH
 
 Automation triggers:
 
-```solidity
-hedge execution
-```
+- hedge execution
 
 
 ### 2.2 Automation Workflow
@@ -409,9 +397,7 @@ The hedge layer opens positions in derivatives markets.
 
 In the hackathon MVP, I implement:
 
-```solidity
-Synthetic hedge contract
-```
+- Synthetic hedge contract
 
 Instead of integrating complex derivatives protocols.
 
@@ -441,27 +427,19 @@ struct HedgePosition {
 
 If LP delta is positive:
 
-```solidity
-LP long asset
-```
+- LP long asset
 
 Then hedge:
 
-```solidity
-short asset
-```
+- short asset
 
 If LP delta is negative:
 
-```solidity
-LP short asset
-```
+- LP short asset
 
 Then hedge:
 
-```solidity
-long asset
-```
+- long asset
 
 
 ### 3.3 Example Hedge
@@ -473,38 +451,28 @@ ETH price = $2000
 
 Hedge:
 
-```solidity
-open short 5 ETH
-```
+- open short 5 ETH
 
 Result:
 
-```solidity
-delta neutral
-```
+- delta neutral
 
 
 ### 3.4 Dynamic Rebalancing
 
 As prices move:
 
-```solidity
-LP delta changes
-```
+- LP delta changes
 
 Example:
 
-```solidity
-Price rises
-LP sells ETH
-delta decreases
-```
+- Price rises
+- LP sells ETH
+- delta decreases
 
 Automation triggers:
 
-```solidity
-hedge rebalance
-```
+- hedge rebalance
 
 
 
@@ -527,16 +495,12 @@ This ensures the system behaves correctly under different scenarios.
 
 The hackathon implementation includes:
 
-```solidity
-delta hedging
-```
+- delta hedging
 
 but excludes:
 
-```solidity
-gamma hedging
-volatility modeling
-```
+- gamma hedging
+- volatility modeling
 
 These are reserved for **future work**.
 
@@ -567,9 +531,7 @@ LP positions have **negative gamma**.
 
 Meaning:
 
-```solidity
-LP loses when volatility increases
-```
+- LP loses when volatility increases
 
 This is why **impermanent loss accelerates during volatility**.
 
@@ -603,23 +565,17 @@ Create automated vaults that provide:
 
 Delta-Neutral Adaptive Liquidity Hook introduces a new primitive for DeFi:
 
-```solidity
-automated LP hedging
-```
+- automated LP hedging
 
 This project moves AMMs toward a new paradigm:
 
-```solidity
-autonomous liquidity management
-```
+- autonomous liquidity management
 
 Where LPs no longer manually manage risk.
 
 Instead:
 
-```solidity
-liquidity → algorithmically hedged
-```
+- liquidity → algorithmically hedged
 
 By combining:
 
