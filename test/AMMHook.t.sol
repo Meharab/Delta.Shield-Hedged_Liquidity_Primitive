@@ -24,7 +24,7 @@ import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 import {AMMHook} from "../src/AMMHook.sol";
 
 /// @title AMMHookTest — Comprehensive test suite for the DeltaShield hook
-/// @dev Covers all 9 test scenarios defined in HookTest.md
+/// @dev Covers all test scenarios
 contract AMMHookTest is Test, Deployers {
     using PoolIdLibrary for PoolKey;
     using StateLibrary for IPoolManager;
