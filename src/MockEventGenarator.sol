@@ -1,9 +1,11 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: UNLICENSED
 
 pragma solidity >=0.8.26;
 
+import {PoolId, PoolIdLibrary} from "v4-core/types/PoolId.sol";
+
 // @title MockEventGenarator: A simple contract to emit HedgeRequired events for testing
-// @dev This contract allows us to simulate the emission of HedgeRequired events for "TESTNET", which can be used to test the Reactive Automation Layer without needing to interact with a real AMM or Uniswap v4 pool. You can deploy this contract on the origin chain and call the emitHedgeRequired function with different parameters to test how the AutomationController reacts to various scenarios.
+// @dev This contract allows us to simulate the emission of HedgeRequired events for "TESTNET", which can be used to test the Reactive Automation Layer without needing to interact with a real AMM or Uniswap v4 pool as it's extreamly hard to simulate pool and hook on the testnet. You can deploy this contract on the origin chain and call the emitHedgeRequired function with different parameters to test how the AutomationController reacts to various scenarios.
 // @dev Note: In local testing, try not to use this contract.
 contract MockEventGenarator {
     event HedgeRequired(
