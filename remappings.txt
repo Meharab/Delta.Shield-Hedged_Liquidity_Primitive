@@ -3,6 +3,7 @@
 @uniswap/v4-core/=lib/v4-periphery/lib/v4-core/
 @uniswap/v4-periphery/=lib/v4-hooks-public/lib/v4-periphery/
 briefcase/=lib/v4-hooks-public/lib/briefcase/src/
+chainlink-brownie-contracts/=lib/chainlink-brownie-contracts/
 ds-test/=lib/v4-periphery/lib/v4-core/lib/forge-std/lib/ds-test/src/
 erc4626-tests/=lib/v4-periphery/lib/v4-core/lib/openzeppelin-contracts/lib/erc4626-tests/
 forge-gas-snapshot/=lib/v4-periphery/lib/permit2/lib/forge-gas-snapshot/src/

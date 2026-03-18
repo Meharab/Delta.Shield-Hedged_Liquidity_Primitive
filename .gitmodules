@@ -7,3 +7,9 @@
 [submodule "lib/v4-hooks-public"]
 	path = lib/v4-hooks-public
 	url = https://github.com/Uniswap/v4-hooks-public
+[submodule "lib/reactive-lib"]
+	path = lib/reactive-lib
+	url = https://github.com/Reactive-Network/reactive-lib
+[submodule "lib/chainlink-brownie-contracts"]
+	path = lib/chainlink-brownie-contracts
+	url = https://github.com/smartcontractkit/chainlink-brownie-contracts
