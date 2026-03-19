@@ -31,7 +31,7 @@ contract MockReactiveSystem {
     }
 }
 
-/// @title AutomationControllerTest 
+/// @title AutomationControllerTest
 /// @dev Comprehensive test suite for the DeltaShield Automation Controller
 contract AutomationControllerTest is Test {
     AutomationController public controller;
@@ -43,7 +43,7 @@ contract AutomationControllerTest is Test {
     uint256 public constant EVENT_TOPIC = 0x8cabf31d2b1b11ba52dbb302817a3c9c83e4b2a5194d35121ab1354d69f6a4cb; // HedgeRequired topic0
 
     address public callbackAddr = address(0xDEADBEEF);
-    
+
     // Test data
     bytes32 poolId = bytes32(uint256(1));
     int256 deltaThreshold;
@@ -53,7 +53,7 @@ contract AutomationControllerTest is Test {
     function setUp() public {
         // Fix: Warp time to 1000 so the first hedge (at t=1000) will pass the cooldown check (1000 > 0 + 60)
         vm.warp(1000);
-        
+
         reqService = new MockReactiveSystem();
         eventGenerator = new MockEventGenerator();
 
@@ -95,7 +95,7 @@ contract AutomationControllerTest is Test {
         // Expect decoding and successful evaluation event
         vm.expectEmit(true, false, false, true);
         emit AutomationController.TriggerEvaluated(poolId, testDelta, true);
-        
+
         controller.react(log);
     }
 
@@ -107,7 +107,7 @@ contract AutomationControllerTest is Test {
 
         vm.expectEmit(true, false, false, true);
         emit AutomationController.TriggerEvaluated(poolId, testDelta, true);
-        
+
         vm.expectEmit(true, false, false, true);
         emit AutomationController.HedgeDispatched(poolId, testDelta, block.timestamp);
 
@@ -127,12 +127,9 @@ contract AutomationControllerTest is Test {
         controller.react(log);
 
         VmSafe.Log[] memory emittedLogs = vm.getRecordedLogs();
-        for (uint i = 0; i < emittedLogs.length; i++) {
+        for (uint256 i = 0; i < emittedLogs.length; i++) {
             // Callback selector
-            assertNotEq(
-                emittedLogs[i].topics[0],
-                keccak256("Callback(uint256,address,uint64,bytes)")
-            );
+            assertNotEq(emittedLogs[i].topics[0], keccak256("Callback(uint256,address,uint64,bytes)"));
         }
     }
 
@@ -142,7 +139,7 @@ contract AutomationControllerTest is Test {
 
         vm.expectEmit(true, false, false, true);
         emit AutomationController.TriggerEvaluated(poolId, testDelta, true);
-        
+
         vm.expectEmit(true, false, false, true);
         emit AutomationController.HedgeDispatched(poolId, testDelta, block.timestamp);
 
@@ -164,7 +161,7 @@ contract AutomationControllerTest is Test {
         controller.react(log);
 
         VmSafe.Log[] memory emittedLogs = vm.getRecordedLogs();
-        for (uint i = 0; i < emittedLogs.length; i++) {
+        for (uint256 i = 0; i < emittedLogs.length; i++) {
             assertNotEq(
                 emittedLogs[i].topics[0],
                 keccak256("Callback(uint256,address,uint64,bytes)"),
@@ -186,7 +183,7 @@ contract AutomationControllerTest is Test {
         // Second trigger works
         vm.expectEmit(true, false, false, true);
         emit AutomationController.TriggerEvaluated(poolId, testDelta, true);
-        
+
         vm.expectEmit(true, false, false, true);
         emit AutomationController.HedgeDispatched(poolId, testDelta, block.timestamp);
 
@@ -200,18 +197,14 @@ contract AutomationControllerTest is Test {
         int256 testDelta = 2 ether;
         IReactive.LogRecord memory log = _buildMockLog(poolId, testDelta, 1000, block.timestamp);
 
-        bytes memory expectedPayload = abi.encodeWithSignature(
-            "executeHedge(bytes32,int256)",
-            poolId,
-            testDelta
-        );
+        bytes memory expectedPayload = abi.encodeWithSignature("executeHedge(bytes32,int256)", poolId, testDelta);
 
         vm.expectEmit(true, false, false, true);
         emit AutomationController.TriggerEvaluated(poolId, testDelta, true);
-        
+
         vm.expectEmit(true, false, false, true);
         emit AutomationController.HedgeDispatched(poolId, testDelta, block.timestamp);
-        
+
         vm.expectEmit(true, true, true, true);
         emit IReactive.Callback(
             DESTINATION_CHAIN_ID,
@@ -238,7 +231,7 @@ contract AutomationControllerTest is Test {
 
     function test_gasReactFunction() public {
         IReactive.LogRecord memory log = _buildMockLog(poolId, 2 ether, 1000, block.timestamp);
-        
+
         uint256 startGas = gasleft();
         controller.react(log);
         uint256 endGas = gasleft();
@@ -248,12 +241,11 @@ contract AutomationControllerTest is Test {
 
     // ─── Helpers ───────────────────────────────────────────────────────
 
-    function _buildMockLog(
-        bytes32 pId,
-        int256 delta,
-        uint160 price,
-        uint256 ts
-    ) internal view returns (IReactive.LogRecord memory) {
+    function _buildMockLog(bytes32 pId, int256 delta, uint160 price, uint256 ts)
+        internal
+        view
+        returns (IReactive.LogRecord memory)
+    {
         return IReactive.LogRecord({
             chain_id: ORIGIN_CHAIN_ID,
             _contract: address(eventGenerator),

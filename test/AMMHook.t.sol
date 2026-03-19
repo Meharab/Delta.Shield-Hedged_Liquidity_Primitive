@@ -40,19 +40,9 @@ contract AMMHookTest is Test, Deployers {
 
     // ─── Events (redeclared for vm.expectEmit) ─────────────────────────
 
-    event HedgeRequired(
-        PoolId indexed poolId,
-        int256 delta,
-        uint160 sqrtPriceX96,
-        uint256 timestamp
-    );
+    event HedgeRequired(PoolId indexed poolId, int256 delta, uint160 sqrtPriceX96, uint256 timestamp);
 
-    event ExposureUpdated(
-        PoolId indexed poolId,
-        int256 delta,
-        uint160 sqrtPriceX96,
-        uint256 timestamp
-    );
+    event ExposureUpdated(PoolId indexed poolId, int256 delta, uint160 sqrtPriceX96, uint256 timestamp);
 
     // ─── Setup ─────────────────────────────────────────────────────────
 
@@ -70,17 +60,11 @@ contract AMMHookTest is Test, Deployers {
 
         // Deploy hook to an address that has the proper flags set
         uint160 flags = uint160(
-            Hooks.AFTER_INITIALIZE_FLAG |
-                Hooks.AFTER_SWAP_FLAG |
-                Hooks.AFTER_ADD_LIQUIDITY_FLAG |
-                Hooks.AFTER_REMOVE_LIQUIDITY_FLAG
+            Hooks.AFTER_INITIALIZE_FLAG | Hooks.AFTER_SWAP_FLAG | Hooks.AFTER_ADD_LIQUIDITY_FLAG
+                | Hooks.AFTER_REMOVE_LIQUIDITY_FLAG
         );
 
-        deployCodeTo(
-            "AMMHook.sol",
-            abi.encode(manager),
-            address(flags)
-        );
+        deployCodeTo("AMMHook.sol", abi.encode(manager), address(flags));
         hook = AMMHook(address(flags));
 
         // Approve our TOKEN for spending on the swap router and modify liquidity router
@@ -88,13 +72,7 @@ contract AMMHookTest is Test, Deployers {
         token.approve(address(modifyLiquidityRouter), type(uint256).max);
 
         // Initialize a pool: ETH / TEST, fee = 3000, initial price = 1
-        (key, ) = initPool(
-            ethCurrency,
-            tokenCurrency,
-            hook,
-            3000,
-            SQRT_PRICE_1_1
-        );
+        (key,) = initPool(ethCurrency, tokenCurrency, hook, 3000, SQRT_PRICE_1_1);
 
         poolId = key.toId();
 
@@ -128,7 +106,7 @@ contract AMMHookTest is Test, Deployers {
     /// @notice Adding liquidity must recalculate delta and emit ExposureUpdated.
     function test_liquidityAddition() public {
         // Capture state before
-        (, int256 deltaBefore, , , ) = hook.poolStates(poolId);
+        (, int256 deltaBefore,,,) = hook.poolStates(poolId);
 
         // Expect ExposureUpdated event
         vm.expectEmit(false, false, false, false);
@@ -138,7 +116,7 @@ contract AMMHookTest is Test, Deployers {
         _addLiquidity(-60, 60, 0.005 ether);
 
         // Verify delta changed
-        (, int256 deltaAfter, , , ) = hook.poolStates(poolId);
+        (, int256 deltaAfter,,,) = hook.poolStates(poolId);
         assertGt(deltaAfter, deltaBefore, "delta should increase after adding liquidity");
     }
 
@@ -147,16 +125,12 @@ contract AMMHookTest is Test, Deployers {
     /// @notice Removing liquidity must update poolState and recalculate delta.
     function test_liquidityRemoval() public {
         // First get current state
-        (, int256 deltaBefore, , , ) = hook.poolStates(poolId);
+        (, int256 deltaBefore,,,) = hook.poolStates(poolId);
         assertGt(deltaBefore, 0, "should have positive delta from setup liquidity");
 
         // Compute a small liquidity amount to remove
         uint160 sqrtPriceAtTickUpper = TickMath.getSqrtPriceAtTick(60);
-        uint128 liqToRemove = LiquidityAmounts.getLiquidityForAmount0(
-            SQRT_PRICE_1_1,
-            sqrtPriceAtTickUpper,
-            0.001 ether
-        );
+        uint128 liqToRemove = LiquidityAmounts.getLiquidityForAmount0(SQRT_PRICE_1_1, sqrtPriceAtTickUpper, 0.001 ether);
 
         // Expect ExposureUpdated event
         vm.expectEmit(false, false, false, false);
@@ -166,16 +140,13 @@ contract AMMHookTest is Test, Deployers {
         modifyLiquidityRouter.modifyLiquidity(
             key,
             ModifyLiquidityParams({
-                tickLower: -60,
-                tickUpper: 60,
-                liquidityDelta: -int256(uint256(liqToRemove)),
-                salt: bytes32(0)
+                tickLower: -60, tickUpper: 60, liquidityDelta: -int256(uint256(liqToRemove)), salt: bytes32(0)
             }),
             ZERO_BYTES
         );
 
         // Verify delta decreased
-        (, int256 deltaAfter, , , ) = hook.poolStates(poolId);
+        (, int256 deltaAfter,,,) = hook.poolStates(poolId);
         assertLt(deltaAfter, deltaBefore, "delta should decrease after removing liquidity");
     }
 
@@ -184,7 +155,7 @@ contract AMMHookTest is Test, Deployers {
     /// @notice A swap must trigger afterSwap, detect price change, and recalculate delta.
     function test_swapTrigger() public {
         // Capture price before swap
-        (uint160 priceBefore, , , ) = manager.getSlot0(poolId);
+        (uint160 priceBefore,,,) = manager.getSlot0(poolId);
 
         // Expect ExposureUpdated event
         vm.expectEmit(false, false, false, false);
@@ -194,11 +165,11 @@ contract AMMHookTest is Test, Deployers {
         _swap(true, 0.001 ether);
 
         // Verify new price different from before
-        (uint160 priceAfter, , , ) = manager.getSlot0(poolId);
+        (uint160 priceAfter,,,) = manager.getSlot0(poolId);
         assertNotEq(priceBefore, priceAfter, "price should change after swap");
 
         // Verify delta is updated in state
-        (, int256 deltaAfter, , , ) = hook.poolStates(poolId);
+        (, int256 deltaAfter,,,) = hook.poolStates(poolId);
         assertGt(deltaAfter, 0, "delta should be positive");
     }
 
@@ -233,9 +204,7 @@ contract AMMHookTest is Test, Deployers {
         _swap(true, 0.0001 ether);
 
         VmSafe.Log[] memory logs = vm.getRecordedLogs();
-        bytes32 hedgeRequiredSelector = keccak256(
-            "HedgeRequired(bytes32,int256,uint160,uint256)"
-        );
+        bytes32 hedgeRequiredSelector = keccak256("HedgeRequired(bytes32,int256,uint160,uint256)");
 
         bool hedgeEmitted = false;
         for (uint256 i = 0; i < logs.length; i++) {
@@ -265,9 +234,7 @@ contract AMMHookTest is Test, Deployers {
         _swap(false, 0.05 ether);
 
         VmSafe.Log[] memory logs = vm.getRecordedLogs();
-        bytes32 hedgeRequiredSelector = keccak256(
-            "HedgeRequired(bytes32,int256,uint160,uint256)"
-        );
+        bytes32 hedgeRequiredSelector = keccak256("HedgeRequired(bytes32,int256,uint160,uint256)");
 
         bool secondHedge = false;
         for (uint256 i = 0; i < logs.length; i++) {
@@ -303,9 +270,7 @@ contract AMMHookTest is Test, Deployers {
         _swap(true, 5 ether);
 
         VmSafe.Log[] memory logs = vm.getRecordedLogs();
-        bytes32 hedgeRequiredSelector = keccak256(
-            "HedgeRequired(bytes32,int256,uint160,uint256)"
-        );
+        bytes32 hedgeRequiredSelector = keccak256("HedgeRequired(bytes32,int256,uint160,uint256)");
 
         // Check at least one HedgeRequired emitted from the large swap
         // Note: there may also be events from _addLiquidity, so we only care
@@ -342,28 +307,26 @@ contract AMMHookTest is Test, Deployers {
     // ─── Helpers ───────────────────────────────────────────────────────
 
     /// @dev Adds liquidity to the pool around the given tick range.
-    function _addLiquidity(
-        int24 tickLower,
-        int24 tickUpper,
-        uint256 ethAmount
-    ) internal {
-        (uint160 currentSqrtPrice, , , ) = manager.getSlot0(poolId);
+    function _addLiquidity(int24 tickLower, int24 tickUpper, uint256 ethAmount) internal {
+        (uint160 currentSqrtPrice,,,) = manager.getSlot0(poolId);
         uint160 sqrtPriceAtTickUpper = TickMath.getSqrtPriceAtTick(tickUpper);
         uint160 sqrtPriceAtTickLower = TickMath.getSqrtPriceAtTick(tickLower);
 
         uint128 liquidityDelta = LiquidityAmounts.getLiquidityForAmount0(
-            currentSqrtPrice < sqrtPriceAtTickLower ? sqrtPriceAtTickLower : 
-            (currentSqrtPrice > sqrtPriceAtTickUpper ? sqrtPriceAtTickUpper : currentSqrtPrice),
+            currentSqrtPrice < sqrtPriceAtTickLower
+                ? sqrtPriceAtTickLower
+                : (currentSqrtPrice > sqrtPriceAtTickUpper ? sqrtPriceAtTickUpper : currentSqrtPrice),
             sqrtPriceAtTickUpper,
             ethAmount
         );
-        
+
         // If price is fully above the range, amount0 is 0. Give fallback liquidity from amount1.
         if (liquidityDelta == 0) {
             liquidityDelta = LiquidityAmounts.getLiquidityForAmount1(
                 sqrtPriceAtTickLower,
-                currentSqrtPrice > sqrtPriceAtTickUpper ? sqrtPriceAtTickUpper : 
-                (currentSqrtPrice < sqrtPriceAtTickLower ? sqrtPriceAtTickLower : currentSqrtPrice),
+                currentSqrtPrice > sqrtPriceAtTickUpper
+                    ? sqrtPriceAtTickUpper
+                    : (currentSqrtPrice < sqrtPriceAtTickLower ? sqrtPriceAtTickLower : currentSqrtPrice),
                 ethAmount // (assuming we just add a symmetric amount for testing)
             );
         }
@@ -389,16 +352,10 @@ contract AMMHookTest is Test, Deployers {
             SwapParams({
                 zeroForOne: zeroForOne,
                 amountSpecified: -int256(amountIn),
-                sqrtPriceLimitX96: zeroForOne
-                    ? TickMath.MIN_SQRT_PRICE + 1
-                    : TickMath.MAX_SQRT_PRICE - 1
+                sqrtPriceLimitX96: zeroForOne ? TickMath.MIN_SQRT_PRICE + 1 : TickMath.MAX_SQRT_PRICE - 1
             }),
-            PoolSwapTest.TestSettings({
-                takeClaims: false,
-                settleUsingBurn: false
-            }),
+            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false}),
             ZERO_BYTES
         );
     }
-
 }

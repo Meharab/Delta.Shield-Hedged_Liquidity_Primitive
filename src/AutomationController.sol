@@ -9,7 +9,6 @@ import {ISystemContract} from "../lib/reactive-lib/src/interfaces/ISystemContrac
 /// @title AutomationController
 /// @notice The core control system monitoring AMM Hook events and dispatching cross-chain hedge execution.
 contract AutomationController is IReactive, AbstractReactive {
-
     // ─── Data Structures ───────────────────────────────────────────────
 
     struct RiskSignal {
@@ -30,9 +29,9 @@ contract AutomationController is IReactive, AbstractReactive {
     uint64 private constant GAS_LIMIT = 1_000_000;
 
     // ─── State ─────────────────────────────────────────────────────────
-    
+
     mapping(bytes32 => uint256) public lastHedgeTimestamp;
-    
+
     // Address of the AMM hook to authorize specific event emitters
     address public originHookAddress;
 
@@ -48,12 +47,12 @@ contract AutomationController is IReactive, AbstractReactive {
     // ─── Constructor ───────────────────────────────────────────────────
 
     constructor(
-        address _service,            
-        uint256 _originChainId,      
-        uint256 _destinationChainId, 
-        address _originHookAddress,  
-        uint256 _eventTopic,         
-        address _callback            
+        address _service,
+        uint256 _originChainId,
+        uint256 _destinationChainId,
+        address _originHookAddress,
+        uint256 _eventTopic,
+        address _callback
     ) payable {
         service = ISystemContract(payable(_service));
 
@@ -64,19 +63,14 @@ contract AutomationController is IReactive, AbstractReactive {
 
         if (!vm) {
             service.subscribe(
-                originChainId,
-                originHookAddress,
-                _eventTopic,
-                REACTIVE_IGNORE,
-                REACTIVE_IGNORE,
-                REACTIVE_IGNORE
+                originChainId, originHookAddress, _eventTopic, REACTIVE_IGNORE, REACTIVE_IGNORE, REACTIVE_IGNORE
             );
         }
     }
 
     // ─── Required Reactive Interface ───────────────────────────────────
 
-    /// @notice Main entry point triggered by the Reactive Network 
+    /// @notice Main entry point triggered by the Reactive Network
     /// @param log Raw event intercepted by the network
     function react(LogRecord calldata log) external vmOnly {
         if (log._contract != originHookAddress) revert InvalidEmitter();
@@ -100,19 +94,11 @@ contract AutomationController is IReactive, AbstractReactive {
     function _decodeEvent(LogRecord calldata log) internal pure returns (RiskSignal memory) {
         // topic1 -> poolId (indexed)
         bytes32 pId = bytes32(log.topic_1);
-        
-        // decode unindexed parameters from the data
-        (int256 d, uint160 price, uint256 ts) = abi.decode(
-            log.data,
-            (int256, uint160, uint256)
-        );
 
-        return RiskSignal({
-            poolId: pId,
-            delta: d,
-            sqrtPriceX96: price,
-            timestamp: ts
-        });
+        // decode unindexed parameters from the data
+        (int256 d, uint160 price, uint256 ts) = abi.decode(log.data, (int256, uint160, uint256));
+
+        return RiskSignal({poolId: pId, delta: d, sqrtPriceX96: price, timestamp: ts});
     }
 
     /// @dev Module 2: Trigger Engine
@@ -133,13 +119,9 @@ contract AutomationController is IReactive, AbstractReactive {
     function _dispatchHedge(RiskSignal memory signal) internal {
         // Update state to lock cooldown
         lastHedgeTimestamp[signal.poolId] = block.timestamp;
-        
+
         // Prepare the payload targeting HedgeController's executeHedge function
-        bytes memory payload = abi.encodeWithSignature(
-            "executeHedge(bytes32,int256)",
-            signal.poolId,
-            signal.delta
-        );
+        bytes memory payload = abi.encodeWithSignature("executeHedge(bytes32,int256)", signal.poolId, signal.delta);
 
         emit HedgeDispatched(signal.poolId, signal.delta, block.timestamp);
         emit Callback(destinationChainId, callback, GAS_LIMIT, payload);

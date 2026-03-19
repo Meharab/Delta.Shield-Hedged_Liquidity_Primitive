@@ -17,14 +17,14 @@ contract AutomationControllerScript is Script {
             // Replace with Reactive System Contract address for target chain
             vm.envAddress("SYSTEM_CONTRACT_ADDR"),
             // Replace with origin chain ID (where AMMHook is deployed)
-            vm.envUint("ORIGIN_CHAIN_ID"), 
+            vm.envUint("ORIGIN_CHAIN_ID"),
             // Replace with destination chain ID (where hedge execution will occur)
-            vm.envUint("DESTINATION_CHAIN_ID"), 
+            vm.envUint("DESTINATION_CHAIN_ID"),
             // Replace with AMMHook contract address
-            vm.envAddress("ORIGIN_ADDR"), 
+            vm.envAddress("ORIGIN_ADDR"),
             // Replace with AMMHook event topic to subscribe to (HedgeRequired event)
             0x8cabf31d2b1b11ba52dbb302817a3c9c83e4b2a5194d35121ab1354d69f6a4cb,
-            // Replace with callback contract address on destination chain 
+            // Replace with callback contract address on destination chain
             vm.envAddress("CALLBACK_ADDR")
         );
         console.log("AutomationController deployed successfully at:", address(automationController));

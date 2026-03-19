@@ -2,28 +2,32 @@
 pragma solidity ^0.8.26;
 
 import {Script, console} from "forge-std/Script.sol";
+import {MockPerpsEngine} from "../src/MockPerpsEngine.sol";
 import {HedgeController} from "../src/HedgeController.sol";
 
-/// @title HedgeControllerScript — Deploys the DeltaShield Hedge Controller
-/// @dev Usage:
-///   Test: forge script script/HedgeController.s.sol:HedgeControllerScript --rpc-url <RPC> --chain-id <ID>
-///   Live: forge script script/HedgeController.s.sol:HedgeControllerScript --rpc-url <RPC> --chain-id <ID> --broadcast --verify
+/// @title HedgeControllerScript
+/// @notice Unified sequential deployment script tying the Mock Engine and HedgeController together
 contract HedgeControllerScript is Script {
     function setUp() public {}
 
     function run() public {
         vm.broadcast();
-        HedgeController hedgeController = new HedgeController(
-            // Replace with Reactive Callback Proxy Contract address for target chain
-            vm.envAddress("DESTINATION_CALLBACK_PROXY_ADDR")
-        );
-        console.log("HedgeController deployed successfully at:", address(hedgeController));
+
+        address automationAddress = vm.envOr("AUTOMATION_ADDR", address(0x123)); // Placeholder
+        address assetAddress = vm.envOr("ASSET_ADDR", address(0x456)); // Placeholder
+        uint256 cooldown = vm.envOr("HEDGE_COOLDOWN", uint256(60)); // 60s
+        uint256 ratio = vm.envOr("HEDGE_RATIO", uint256(0.7e18)); // 70%
+
+        // Pre-compute the execution address to initialize circular authorization
+        address expectedController = vm.computeCreateAddress(msg.sender, vm.getNonce(msg.sender) + 1);
+
+        MockPerpsEngine engine = new MockPerpsEngine(expectedController);
+
+        HedgeController controller =
+            new HedgeController(automationAddress, address(engine), assetAddress, cooldown, ratio);
+
+        console.log("System Automation Target:", automationAddress);
+        console.log("Linked MockPerpsEngine deployed at:", address(engine));
+        console.log("Linked HedgeController deployed at:", address(controller));
     }
 }
-/// @dev you can also deploy the HedgeController with cast:
-// forge create --broadcast --rpc-url $DESTINATION_RPC --account $ACC src/HedgeController.sol:HedgeController --value 0.0001ether --constructor-args $DESTINATION_CALLBACK_PROXY_ADDR 
-
-// Example output
-// Deployer: 0x55F710a5509f4a8a8fE8a41dF476e51daD401454
-// Deployed to: 0x9999B3f485771b681Cf88Abfd2fD9ed36b7F69e1
-// Transaction hash: 0xe3d8d81b11a3d9128a092e3d441d2f3c65736bf5de8147afd6cc35de29ef3aed

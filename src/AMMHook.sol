@@ -39,20 +39,10 @@ contract AMMHook is BaseHook {
     // ─── Events ────────────────────────────────────────────────────────
 
     /// @notice Emitted when LP exposure exceeds the hedge threshold.
-    event HedgeRequired(
-        PoolId indexed poolId,
-        int256 delta,
-        uint160 sqrtPriceX96,
-        uint256 timestamp
-    );
+    event HedgeRequired(PoolId indexed poolId, int256 delta, uint160 sqrtPriceX96, uint256 timestamp);
 
     /// @notice Emitted on every exposure update for continuous monitoring.
-    event ExposureUpdated(
-        PoolId indexed poolId,
-        int256 delta,
-        uint160 sqrtPriceX96,
-        uint256 timestamp
-    );
+    event ExposureUpdated(PoolId indexed poolId, int256 delta, uint160 sqrtPriceX96, uint256 timestamp);
 
     // ─── Custom Errors ─────────────────────────────────────────────────
 
@@ -88,40 +78,33 @@ contract AMMHook is BaseHook {
     // ─── Hook Permissions ──────────────────────────────────────────────
 
     /// @inheritdoc BaseHook
-    function getHookPermissions()
-        public
-        pure
-        override
-        returns (Hooks.Permissions memory)
-    {
-        return
-            Hooks.Permissions({
-                beforeInitialize: false,
-                afterInitialize: true,
-                beforeAddLiquidity: false,
-                afterAddLiquidity: true,
-                beforeRemoveLiquidity: false,
-                afterRemoveLiquidity: true,
-                beforeSwap: false,
-                afterSwap: true,
-                beforeDonate: false,
-                afterDonate: false,
-                beforeSwapReturnDelta: false,
-                afterSwapReturnDelta: false,
-                afterAddLiquidityReturnDelta: false,
-                afterRemoveLiquidityReturnDelta: false
-            });
+    function getHookPermissions() public pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            beforeInitialize: false,
+            afterInitialize: true,
+            beforeAddLiquidity: false,
+            afterAddLiquidity: true,
+            beforeRemoveLiquidity: false,
+            afterRemoveLiquidity: true,
+            beforeSwap: false,
+            afterSwap: true,
+            beforeDonate: false,
+            afterDonate: false,
+            beforeSwapReturnDelta: false,
+            afterSwapReturnDelta: false,
+            afterAddLiquidityReturnDelta: false,
+            afterRemoveLiquidityReturnDelta: false
+        });
     }
 
     // ─── Hook Entry Points ─────────────────────────────────────────────
 
     /// @notice Called after a pool is initialized. Stores initial price and sets defaults.
-    function _afterInitialize(
-        address,
-        PoolKey calldata key,
-        uint160 sqrtPriceX96,
-        int24
-    ) internal override returns (bytes4) {
+    function _afterInitialize(address, PoolKey calldata key, uint160 sqrtPriceX96, int24)
+        internal
+        override
+        returns (bytes4)
+    {
         PoolId id = key.toId();
 
         poolStates[id] = PoolState({
@@ -165,13 +148,11 @@ contract AMMHook is BaseHook {
 
     /// @notice Called after every swap. Main risk detection trigger.
     /// @dev Recomputes delta, checks threshold + cooldown, and emits HedgeRequired if needed.
-    function _afterSwap(
-        address,
-        PoolKey calldata key,
-        SwapParams calldata,
-        BalanceDelta,
-        bytes calldata
-    ) internal override returns (bytes4, int128) {
+    function _afterSwap(address, PoolKey calldata key, SwapParams calldata, BalanceDelta, bytes calldata)
+        internal
+        override
+        returns (bytes4, int128)
+    {
         PoolId id = key.toId();
         PoolState storage state = poolStates[id];
 
@@ -235,23 +216,16 @@ contract AMMHook is BaseHook {
     }
 
     /// @dev Returns true when LP exposure exceeds the threshold AND the cooldown has elapsed.
-    function _shouldHedge(
-        PoolState storage state,
-        int256 delta
-    ) internal view returns (bool) {
+    function _shouldHedge(PoolState storage state, int256 delta) internal view returns (bool) {
         int256 absDelta = delta >= 0 ? delta : -delta;
         bool exceedsThreshold = uint256(absDelta) > state.deltaThreshold;
-        bool cooldownElapsed = block.timestamp >=
-            state.lastHedgeTimestamp + state.minRebalanceInterval;
+        bool cooldownElapsed = block.timestamp >= state.lastHedgeTimestamp + state.minRebalanceInterval;
 
         return exceedsThreshold && cooldownElapsed;
     }
 
     /// @dev Returns true if the price change exceeds PRICE_SHOCK_BPS basis points.
-    function _isPriceShock(
-        uint160 current,
-        uint160 last
-    ) internal pure returns (bool) {
+    function _isPriceShock(uint160 current, uint160 last) internal pure returns (bool) {
         if (last == 0) return false;
 
         uint256 diff;
