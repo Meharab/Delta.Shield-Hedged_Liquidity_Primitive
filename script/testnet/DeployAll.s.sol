@@ -17,7 +17,7 @@ contract DeployAll is Script {
         uint256 destChainId = vm.envUint("DESTINATION_CHAIN_ID");
 
         address systemContract = vm.envAddress("SYSTEM_CONTRACT_ADDR");
-        address callbackProxy = vm.envAddress("CALLBACK_PROXY_ADDR");
+        address callbackProxy = vm.envAddress("DESTINATION_CALLBACK_PROXY_ADDR");
         address assetAddress = vm.envOr("ASSET_ADDR", address(0x456)); 
         
         uint256 topic0 = uint256(keccak256("HedgeRequired(bytes32,int256,uint160,uint256)"));
