@@ -8,11 +8,11 @@ interface IHedgeController {
     event HedgeAdjusted(bytes32 indexed poolId, int256 newSize);
     event HedgeClosed(bytes32 indexed poolId);
 
-    /// @notice Core execution router entry point invoked natively by the Automation layer
+    /// @param sender RVM instance address validating the origin of the event
     /// @param poolId Identifier of the liquidity pool risk bounds breached
     /// @param lpDelta The calculated exposure of the LP (must open inverse)
     /// @param price The execution entry price point
-    function executeHedge(bytes32 poolId, int256 lpDelta, uint256 price) external;
+    function callback(address sender, bytes32 poolId, int256 lpDelta, uint256 price) external;
 
     /// @notice Exclusively rebalance existing tracking position offsets
     function rebalanceHedge(bytes32 poolId, int256 newDelta) external;

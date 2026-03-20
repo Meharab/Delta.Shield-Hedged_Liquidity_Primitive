@@ -13,7 +13,7 @@ contract HedgeControllerScript is Script {
     function run() public {
         vm.broadcast();
 
-        address automationAddress = vm.envOr("AUTOMATION_ADDR", address(0x123)); // Placeholder
+        address callbackProxyAddress = vm.envOr("CALLBACK_PROXY_ADDR", address(0x123)); // Placeholder
         address assetAddress = vm.envOr("ASSET_ADDR", address(0x456)); // Placeholder
         uint256 cooldown = vm.envOr("HEDGE_COOLDOWN", uint256(60)); // 60s
         uint256 ratio = vm.envOr("HEDGE_RATIO", uint256(0.7e18)); // 70%
@@ -24,9 +24,10 @@ contract HedgeControllerScript is Script {
         MockPerpsEngine engine = new MockPerpsEngine(expectedController);
 
         HedgeController controller =
-            new HedgeController(automationAddress, address(engine), assetAddress, cooldown, ratio);
+            new HedgeController(callbackProxyAddress, assetAddress, cooldown, ratio);
+        controller.setPerpsEngine(address(engine));
 
-        console.log("System Automation Target:", automationAddress);
+        console.log("System Callback Proxy Target:", callbackProxyAddress);
         console.log("Linked MockPerpsEngine deployed at:", address(engine));
         console.log("Linked HedgeController deployed at:", address(controller));
     }

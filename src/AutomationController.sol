@@ -120,8 +120,14 @@ contract AutomationController is IReactive, AbstractReactive {
         // Update state to lock cooldown
         lastHedgeTimestamp[signal.poolId] = block.timestamp;
 
-        // Prepare the payload targeting HedgeController's executeHedge function
-        bytes memory payload = abi.encodeWithSignature("executeHedge(bytes32,int256)", signal.poolId, signal.delta);
+        // Prepare the payload targeting HedgeController's callback function via AbstractCallback logic
+        bytes memory payload = abi.encodeWithSignature(
+            "callback(address,bytes32,int256,uint256)",
+            address(0),
+            signal.poolId,
+            signal.delta,
+            signal.sqrtPriceX96
+        );
 
         emit HedgeDispatched(signal.poolId, signal.delta, block.timestamp);
         emit Callback(destinationChainId, callback, GAS_LIMIT, payload);

@@ -3,15 +3,14 @@ pragma solidity ^0.8.26;
 
 import {IHedgeController} from "./interfaces/IHedgeController.sol";
 import {IPerpsEngine} from "./interfaces/IPerpsEngine.sol";
+import {AbstractCallback} from "../lib/reactive-lib/src/abstract-base/AbstractCallback.sol";
 
 /// @title HedgeController
 /// @notice Actuator execution engine for the DeltaShield reactive system.
-contract HedgeController is IHedgeController {
-    error Unauthorized();
+contract HedgeController is IHedgeController, AbstractCallback {
     error CooldownActive();
 
-    address public immutable automationController;
-    address public immutable perpsEngine;
+    address public perpsEngine;
     address public immutable asset;
 
     uint256 public hedgeCooldown;
@@ -21,27 +20,29 @@ contract HedgeController is IHedgeController {
     mapping(bytes32 => int256) public lastDelta;
     mapping(bytes32 => uint256) public lastHedgeTimestamp;
 
-    modifier onlyAutomation() {
-        if (msg.sender != automationController) revert Unauthorized();
-        _;
-    }
-
     constructor(
-        address _automationController,
-        address _perpsEngine,
+        address _callback_sender,
         address _asset,
         uint256 _hedgeCooldown,
         uint256 _hedgeRatio
-    ) {
-        automationController = _automationController;
-        perpsEngine = _perpsEngine;
+    ) AbstractCallback(_callback_sender) payable {
         asset = _asset;
         hedgeCooldown = _hedgeCooldown;
         hedgeRatio = _hedgeRatio;
     }
 
+    /// @notice Links the execution engine during asynchronous system setups
+    function setPerpsEngine(address _engine) external {
+        perpsEngine = _engine;
+    }
+
     /// @inheritdoc IHedgeController
-    function executeHedge(bytes32 poolId, int256 lpDelta, uint256 price) external onlyAutomation {
+    function callback(
+        address sender,
+        bytes32 poolId,
+        int256 lpDelta,
+        uint256 price
+    ) external authorizedSenderOnly rvmIdOnly(sender) {
         if (block.timestamp <= lastHedgeTimestamp[poolId] + hedgeCooldown && lastHedgeTimestamp[poolId] != 0) {
             revert CooldownActive();
         }
@@ -85,7 +86,7 @@ contract HedgeController is IHedgeController {
     }
 
     /// @inheritdoc IHedgeController
-    function rebalanceHedge(bytes32 poolId, int256 newDelta) external onlyAutomation {
+    function rebalanceHedge(bytes32 poolId, int256 newDelta) external authorizedSenderOnly {
         // Simple passthrough for explicit rebalance, but passes price = 0 (or requires price to be fetched theoretically)
         // Note: For MVP, executeHedge is the standard entrypoint ensuring price is provided,
         // but rebalanceHedge is required by interface definition. Assuming price is not passed directly, we fallback to 0.
@@ -105,7 +106,7 @@ contract HedgeController is IHedgeController {
     }
 
     /// @inheritdoc IHedgeController
-    function closeHedge(bytes32 poolId) external onlyAutomation {
+    function closeHedge(bytes32 poolId) external authorizedSenderOnly {
         // Allow isolated closes without prices (PnL evaluated at 0 for MVP)
         _closeHedge(poolId, 0);
     }
