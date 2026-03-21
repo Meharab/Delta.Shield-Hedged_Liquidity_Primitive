@@ -106,7 +106,7 @@ Yield = Swap Fees – Hedge Cost
 
 # Core Innovation
 
-## 1. On-Chain Delta Approximation
+### 1. On-Chain Delta Approximation
 
 Instead of heavy computation:
 
@@ -125,7 +125,7 @@ This enables:
 
 
 
-## 2. Event-Driven Hedging (No Keepers)
+### 2. Event-Driven Hedging (No Keepers)
 
 Traditional systems:
 
@@ -145,7 +145,7 @@ Event → Reactive VM → Execution
 
 
 
-## 3. Cross-Chain Risk Offloading
+### 3. Cross-Chain Risk Offloading
 
 * Ethereum → Expensive, state-heavy
 * Unichain → Cheap execution layer
@@ -252,25 +252,25 @@ Net Exposure    ≈ 0
 
 # Smart Contract Modules
 
-## AMM Layer
+### AMM Layer
 
 * `AMMHook.sol`
 * Exposure tracking
 * Event emission
 
-## Automation Layer
+### Automation Layer
 
 * `AutomationController.sol`
 * Trigger engine
 * Cross-chain dispatcher
 
-## Hedge Layer
+### Hedge Layer
 
 * `HedgeController.sol`
 * Execution receiver
 * Position manager
 
-## Simulation Engine
+### Simulation Engine
 
 * `MockPerpsEngine.sol`
 * Tracks:
@@ -301,17 +301,17 @@ Net Exposure    ≈ 0
 
 # Key Engineering Trade-offs
 
-## 1. Delta Approximation
+### 1. Delta Approximation
 
 * Gas efficient
 * Not perfectly accurate
 
-## 2. No Gamma Modeling
+### 2. No Gamma Modeling
 
 * Simpler MVP
 * Less optimal in high volatility
 
-## 3. Mock Perps Engine
+### 3. Mock Perps Engine
 
 * Deterministic demo
 * Not real market execution
@@ -320,19 +320,19 @@ Net Exposure    ≈ 0
 
 # Future Roadmap
 
-## 1. Gamma-Aware Hedging
+### 1. Gamma-Aware Hedging
 
 ```
 Adjust the hedge dynamically with curvature
 ```
 
-## 2. Real Perp Integrations
+### 2. Real Perp Integrations
 
 * GMX
 * Synthetix
 * Hyperliquid
 
-## 3. Delta-Neutral Vaults
+### 3. Delta-Neutral Vaults
 
 ```solidity
 LP + Auto Hedging + Auto Compounding
@@ -374,10 +374,10 @@ forge test
 
 # Key Insight
 
-> AMMs solved trading liquidity.
-> DeltaShield solves liquidity risk.
+- AMMs solved trading liquidity.
+- DeltaShield solves liquidity risk.
 
 
 
-# DeltaShield
+# Conclusion
 **From Passive LPing → Active Risk-Managed Yield**
