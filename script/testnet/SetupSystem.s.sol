@@ -17,8 +17,8 @@ contract SetupSystem is Script {
         vm.selectFork(destRpc);
         vm.startBroadcast();
 
-        HedgeController hedge = HedgeController(hedgeControllerAddr);
-        MockPerpsEngine engine = MockPerpsEngine(perpsEngineAddr);
+        HedgeController hedge = HedgeController(payable(hedgeControllerAddr));
+        MockPerpsEngine engine = MockPerpsEngine(payable(perpsEngineAddr));
 
         // Ensure engine is linked
         if (hedge.perpsEngine() != address(engine)) {
