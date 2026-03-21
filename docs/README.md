@@ -17,9 +17,9 @@ Navigate the technical specifications using the following guide:
 | [Hedge.md](./Hedge.md) | Execution Layer | Derivative strategies and mock perps engine. |
 | [Security.md](./Security.md) | Risk & Safety | Threat modeling and gas optimizations. |
 
----
 
-## 🏗️ System Architecture
+
+## System Architecture
 
 DeltaShield implements a **Synchronous Sensation + Asynchronous Execution** loop.
 
@@ -43,9 +43,9 @@ graph TD
     end
 ```
 
----
 
-## 📐 The Mathematics of Delta Neutrality
+
+## The Mathematics of Delta Neutrality
 
 The core breakthrough of DeltaShield is the simplification of high-order calculus into efficient on-chain logic.
 
@@ -66,14 +66,14 @@ $$\huge \Delta \equiv x$$
 
 **Conclusion**: To hedge an LP position, the system simply needs to hold a short position equal to the current amount of Token0 held by the LP.
 
----
 
-## 🔢 Numerical Example
+
+##  Numerical Example
 
 **Scenario**: An LP provides liquidity to an ETH/USDC pool.
 
-*   **Range**: $1500 - $2500 ($\sqrt{P_a} \approx 38.73, \sqrt{P_b} \approx 50$)
-*   **Current Price**: $2000 ($\sqrt{P} \approx 44.72$)
+*   **Range**: $1500 - $2500 ( $\sqrt{P_a} \approx 38.73, \sqrt{P_b} \approx 50$ )
+*   **Current Price**: $2000 ( $\sqrt{P} \approx 44.72$ )
 *   **Liquidity ($L$)**: 1000
 
 ### Step 1: Compute Exposure
@@ -89,9 +89,9 @@ If ETH price rises to **$2100**:
 2.  **Hedge Position**: Value decreases by $\huge 2.36 \times \$100 = -\$236$.
 3.  **Net Result**: **$0 change in principal.** The LP successfully captures the **Trading Fees** without the price risk.
 
----
 
-## 🔄 System Workflow
+
+## System Workflow
 
 1.  **Sensing**: `AMMHook` observes `slot0` changes.
 2.  **Filtering**: Hook checks if `abs(delta) > threshold` and `cooldown` is met.
