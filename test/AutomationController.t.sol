@@ -197,13 +197,8 @@ contract AutomationControllerTest is Test {
         int256 testDelta = 2 ether;
         IReactive.LogRecord memory log = _buildMockLog(poolId, testDelta, 1000, block.timestamp);
 
-        bytes memory expectedPayload = abi.encodeWithSignature(
-            "callback(address,bytes32,int256,uint256)",
-            address(0),
-            poolId,
-            testDelta,
-            1000
-        );
+        bytes memory expectedPayload =
+            abi.encodeWithSignature("callback(address,bytes32,int256,uint256)", address(0), poolId, testDelta, 1000);
 
         vm.expectEmit(true, false, false, true);
         emit AutomationController.TriggerEvaluated(poolId, testDelta, true);

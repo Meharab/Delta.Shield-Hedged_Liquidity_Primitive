@@ -23,8 +23,7 @@ contract HedgeControllerScript is Script {
 
         MockPerpsEngine engine = new MockPerpsEngine(expectedController);
 
-        HedgeController controller =
-            new HedgeController(callbackProxyAddress, assetAddress, cooldown, ratio);
+        HedgeController controller = new HedgeController(callbackProxyAddress, assetAddress, cooldown, ratio);
         controller.setPerpsEngine(address(engine));
 
         console.log("System Callback Proxy Target:", callbackProxyAddress);

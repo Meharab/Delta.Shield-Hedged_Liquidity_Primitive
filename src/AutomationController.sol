@@ -122,11 +122,7 @@ contract AutomationController is IReactive, AbstractReactive {
 
         // Prepare the payload targeting HedgeController's callback function via AbstractCallback logic
         bytes memory payload = abi.encodeWithSignature(
-            "callback(address,bytes32,int256,uint256)",
-            address(0),
-            signal.poolId,
-            signal.delta,
-            signal.sqrtPriceX96
+            "callback(address,bytes32,int256,uint256)", address(0), signal.poolId, signal.delta, signal.sqrtPriceX96
         );
 
         emit HedgeDispatched(signal.poolId, signal.delta, block.timestamp);

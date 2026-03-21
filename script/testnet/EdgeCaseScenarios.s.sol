@@ -12,7 +12,7 @@ contract EdgeCaseScenarios is Script {
         vm.selectFork(originRpc);
         vm.startBroadcast();
         MockEventGenerator generator = MockEventGenerator(generatorAddr);
-        
+
         bytes32 poolId = bytes32(uint256(42));
 
         console.log("=== Edge Case Scenarios Execution ===");

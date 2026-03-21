@@ -11,23 +11,23 @@ contract TriggerHedgeFlow is Script {
 
         vm.selectFork(originRpc);
         vm.startBroadcast();
-        
+
         MockEventGenerator generator = MockEventGenerator(generatorAddr);
-        
+
         bytes32 poolId = bytes32(uint256(1));
         int256 delta = 10 ether; // Triggers a 7 ETH Short (-7 ether exposure)
         uint160 price = 2000;
-        
+
         console.log("Emitting Risk Signal on Origin Chain...");
         generator.emitHedgeRequired(poolId, delta, price);
         console.log("Signal Emitted. Pool ID:", uint256(poolId));
         console.log("Delta Required:", delta);
-        
+
         vm.stopBroadcast();
 
         // CRITICAL CONSTRAINTS: Simulate async Reactive Network execution
         // We inherently cannot wait for synchronous execution, cross-chain bounds apply delay
-        for (uint i = 0; i < 5; i++) {
+        for (uint256 i = 0; i < 5; i++) {
             console.log("Waiting for cross-chain relay... [Delay Simulation Tick", i, "]");
         }
 

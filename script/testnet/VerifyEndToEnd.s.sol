@@ -8,7 +8,7 @@ contract VerifyEndToEnd is Script {
     function run() public {
         uint256 destRpc = vm.createSelectFork(vm.envString("DESTINATION_RPC"));
         address engineAddr = vm.envAddress("PERPS_ENGINE_ADDR");
-        
+
         bytes32 poolId = bytes32(uint256(1)); // Matching target from TriggerHedgeFlow
 
         vm.selectFork(destRpc);
@@ -21,8 +21,8 @@ contract VerifyEndToEnd is Script {
 
         // Verification 2: Direction Correctness
         // Our hedge trigger sent +10 ether. Ratio is 70% bounds = -7 ether.
-        require(exposure == -7 ether, "FAIL: Incorrect hedge direction or sizing calculation."); 
-        
+        require(exposure == -7 ether, "FAIL: Incorrect hedge direction or sizing calculation.");
+
         // Verification 3: Position Persistence bounds natively mapped
         uint256 expectedPositionId = engine.poolPosition(poolId);
         (uint256 id,,,,,) = engine.positions(expectedPositionId);

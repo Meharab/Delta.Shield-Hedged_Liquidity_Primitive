@@ -18,8 +18,8 @@ contract DeployAll is Script {
 
         address systemContract = vm.envAddress("SYSTEM_CONTRACT_ADDR");
         address callbackProxy = vm.envAddress("DESTINATION_CALLBACK_PROXY_ADDR");
-        address assetAddress = vm.envOr("ASSET_ADDR", address(0x456)); 
-        
+        address assetAddress = vm.envOr("ASSET_ADDR", address(0x456));
+
         uint256 topic0 = uint256(keccak256("HedgeRequired(bytes32,int256,uint160,uint256)"));
 
         // 1. ORIGIN CHAIN (Ethereum Sepolia)
@@ -32,7 +32,7 @@ contract DeployAll is Script {
         // 2. DESTINATION CHAIN (Unichain Sepolia)
         vm.selectFork(destRpc);
         vm.startBroadcast();
-        
+
         // Circular dependency broken via setters
         HedgeController hedge = new HedgeController{value: 0.0005 ether}(
             callbackProxy,
@@ -51,12 +51,7 @@ contract DeployAll is Script {
         vm.selectFork(reactiveRpc);
         vm.startBroadcast();
         AutomationController automation = new AutomationController{value: 0.01 ether}(
-            systemContract,
-            originChainId,
-            destChainId,
-            address(generator),
-            topic0,
-            address(hedge)
+            systemContract, originChainId, destChainId, address(generator), topic0, address(hedge)
         );
         vm.stopBroadcast();
 

@@ -20,12 +20,10 @@ contract HedgeController is IHedgeController, AbstractCallback {
     mapping(bytes32 => int256) public lastDelta;
     mapping(bytes32 => uint256) public lastHedgeTimestamp;
 
-    constructor(
-        address _callback_sender,
-        address _asset,
-        uint256 _hedgeCooldown,
-        uint256 _hedgeRatio
-    ) AbstractCallback(_callback_sender) payable {
+    constructor(address _callback_sender, address _asset, uint256 _hedgeCooldown, uint256 _hedgeRatio)
+        payable
+        AbstractCallback(_callback_sender)
+    {
         asset = _asset;
         hedgeCooldown = _hedgeCooldown;
         hedgeRatio = _hedgeRatio;
@@ -37,12 +35,11 @@ contract HedgeController is IHedgeController, AbstractCallback {
     }
 
     /// @inheritdoc IHedgeController
-    function callback(
-        address sender,
-        bytes32 poolId,
-        int256 lpDelta,
-        uint256 price
-    ) external authorizedSenderOnly rvmIdOnly(sender) {
+    function callback(address sender, bytes32 poolId, int256 lpDelta, uint256 price)
+        external
+        authorizedSenderOnly
+        rvmIdOnly(sender)
+    {
         if (block.timestamp <= lastHedgeTimestamp[poolId] + hedgeCooldown && lastHedgeTimestamp[poolId] != 0) {
             revert CooldownActive();
         }
