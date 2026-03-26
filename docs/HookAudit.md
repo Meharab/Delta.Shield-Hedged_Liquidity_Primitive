@@ -657,29 +657,29 @@ Ignore changes within same block
 
 # 🧠 Final Evaluation
 
-### What the agent did right
+### What the architecture did right
 
-✔ Correct architectural separation
-✔ Clean hook design (non-invasive)
-✔ Event-driven signaling
-✔ Gas-aware implementation
-✔ Added volatility trigger (nice touch)
+- ✔ Correct architectural separation
+- ✔ Clean hook design (non-invasive)
+- ✔ Event-driven signaling
+- ✔ Gas-aware implementation
+- ✔ Added volatility trigger (nice touch)
 
----
 
-## What is missing (research gap)
 
-❌ Accurate delta modeling
-❌ Directionality
-❌ Liquidity-triggered hedging
-❌ Manipulation resistance
-❌ Gamma awareness
+### What is missing (research gap)
 
----
+- ❌ Accurate delta modeling
+- ❌ Directionality
+- ❌ Liquidity-triggered hedging
+- ❌ Manipulation resistance
+- ❌ Gamma awareness
+
+
 
 # 🔥 Key Insight
 
-Your current hook is:
+The current hook is:
 
 ```text
 A FIRST-ORDER RISK SENSOR (Δ-only, coarse)
@@ -691,15 +691,11 @@ The next evolution:
 A SECOND-ORDER RISK ENGINE (Δ + Γ + regime-aware)
 ```
 
----
-
-If you want, next we can:
-
-👉 Upgrade this hook into a **production-grade quantitative risk engine**
+👉 Upgrade this hook into a **production-grade quantitative risk engine** by executing:
 
 * exact delta math (v4 concentrated liquidity)
 * directional exposure
 * gamma-aware triggers
 * volatility-adjusted hedging
 
-This is where your project becomes **research-grade + fundable**.
+This is where the project becomes **research-grade**.
