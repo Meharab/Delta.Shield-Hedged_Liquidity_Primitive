@@ -1,5 +1,7 @@
 <img src="https://github.com/Meharab/Delta.Shield-Hedged_Liquidity_Primitive/blob/main/DeltaShield.png" alt="delta sheild logo" width="175" height="175" style="display:block; margin:auto;">
 
+> **_[YouTube Demo](https://www.youtube.com/embed/XJKf2RXqiII)_**
+
 # DeltaShield: Hedged Liquidity Primitive
 
 > **Programmable Risk Management for AMMs — Turning LPing into a Market-Neutral Yield Primitive**
